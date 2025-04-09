@@ -11,20 +11,21 @@ from sklearn.metrics import (
 
 
 class Optimize:
-    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, scoring="recall"):
+    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, cv, scoring="recall"):
         self.model = model
         self.param_grid = param_grid
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
         self.y_test = y_test
+        self.cv = cv
         self.scoring = scoring
 
     def with_random_search(self):
         rs = RandomizedSearchCV(
             self.model,
             self.param_grid,
-            cv=5,
+            cv=self.cv,
             n_jobs=2,
             verbose=1,
             scoring=self.scoring
@@ -52,6 +53,7 @@ class Optimize:
         print(f"Recall Score: {recall}\n")
         print(f"Precision Score: {precision}\n")
         print(f"\nROC AUC Score: {rocauc_score}\n")
+        print(f"Confusion Matrix: {cm}")
 
     def with_bayesian_search(self):
         bs = BayesSearchCV(
@@ -86,3 +88,4 @@ class Optimize:
         print(f"Recall Score: {recall}\n")
         print(f"Precision Score: {precision}\n")
         print(f"\nROC AUC Score: {rocauc_score}\n")
+        print(f"Confusion Matrix: {cm}")
