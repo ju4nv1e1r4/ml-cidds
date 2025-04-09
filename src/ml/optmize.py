@@ -6,12 +6,13 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
     classification_report,
-    confusion_matrix
+    confusion_matrix,
+    f1_score
 )
 
 
 class Optimize:
-    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, cv, verbose=1, n_iter=25, scoring="recall"):
+    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, cv, verbose=1, n_iter=25, scoring="recall", thresholds=None, ):
         self.model = model
         self.param_grid = param_grid
         self.X_train = X_train
@@ -22,6 +23,13 @@ class Optimize:
         self.verbose = verbose
         self.n_iter = n_iter
         self.scoring = scoring
+        self.thresholds = thresholds or {
+            "recall": 0.8,
+            "precision": 0.8,
+            "f1_score": 0.8,
+            "accuracy": 0.8,
+            "roc_auc": 0.8
+        }
     
     def refine_param_grid(self, best_params, spread=0.2):
         """
@@ -45,7 +53,7 @@ class Optimize:
 
         return new_grid
 
-    def with_random_search(self):
+    def with_random_search(self) -> dict:
         rs = RandomizedSearchCV(
             self.model,
             self.param_grid,
@@ -83,9 +91,9 @@ class Optimize:
         best_params = rs.best_params_
         self.param_grid = self.refine_param_grid(best_params)
 
-        return rs.best_params_
+        return best_params
 
-    def with_bayesian_search(self):
+    def with_bayesian_search(self) -> dict:
         bs = BayesSearchCV(
             self.model,
             self.param_grid,
@@ -108,6 +116,7 @@ class Optimize:
         accuracy = accuracy_score(self.y_test, predictions)
         recall = recall_score(self.y_test, predictions)
         cf = classification_report(self.y_test, predictions)
+        f1 = f1_score(self.y_test, predictions)
         rocauc_score = roc_auc_score(predictions, proba)
         precision = precision_score(predictions, self.y_test)
         cm = confusion_matrix(predictions, self.y_test)
@@ -117,7 +126,18 @@ class Optimize:
         print(f"Accuracy Score: {accuracy}\n")
         print(f"Recall Score: {recall}\n")
         print(f"Precision Score: {precision}\n")
+        print(f"F1 Score: {f1}\n")
         print(f"\nROC AUC Score: {rocauc_score}\n")
         print(f"Confusion Matrix: {cm}")
 
-        return bs.best_params_
+        if (
+            recall >= self.thresholds.get("recall", 0) and
+            precision >= self.thresholds.get("precision", 0) and
+            accuracy >= self.thresholds.get("accuracy", 0) and
+            f1 >= self.thresholds.get("f1_score", 0) and
+            rocauc_score >= self.thresholds.get("roc_auc", 0)
+        ):
+            return bs.best_params_
+        else:
+            print("Metrics are not good enough. Check your steps before this optimization.")
+            return {}
