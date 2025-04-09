@@ -11,7 +11,7 @@ from sklearn.metrics import (
 
 
 class Optimize:
-    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, cv, scoring="recall"):
+    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, cv, verbose=1, n_iter=25, scoring="recall"):
         self.model = model
         self.param_grid = param_grid
         self.X_train = X_train
@@ -19,7 +19,31 @@ class Optimize:
         self.X_test = X_test
         self.y_test = y_test
         self.cv = cv
+        self.verbose = verbose
+        self.n_iter = n_iter
         self.scoring = scoring
+    
+    def refine_param_grid(self, best_params, spread=0.2):
+        """
+        Cria um novo grid em torno dos melhores parâmetros encontrados.
+        Ideal para uso no BayesSearchCV após RandomSearchCV.
+        """
+        new_grid = {}
+
+        for param, best_val in best_params.items():
+            if isinstance(best_val, (int, float)):
+                min_val = best_val * (1 - spread)
+                max_val = best_val * (1 + spread)
+
+                if isinstance(best_val, int):
+                    new_grid[param] = list(range(max(int(min_val), 1), int(max_val) + 1))
+                else:
+                    new_grid[param] = (min_val, max_val)  # formato contínuo para bayessearchcv
+            else:
+                # parâmetro categórico
+                new_grid[param] = [best_val]
+
+        return new_grid
 
     def with_random_search(self):
         rs = RandomizedSearchCV(
@@ -27,7 +51,8 @@ class Optimize:
             self.param_grid,
             cv=self.cv,
             n_jobs=2,
-            verbose=1,
+            verbose=self.verbose,
+            n_iter=self.n_iter,
             scoring=self.scoring
         )
 
@@ -55,14 +80,19 @@ class Optimize:
         print(f"\nROC AUC Score: {rocauc_score}\n")
         print(f"Confusion Matrix: {cm}")
 
+        best_params = rs.best_params_
+        self.param_grid = self.refine_param_grid(best_params)
+
+        return rs.best_params_
+
     def with_bayesian_search(self):
         bs = BayesSearchCV(
             self.model,
             self.param_grid,
             cv=5,
             n_jobs=2,
-            verbose=1,
-            n_iter=50,
+            verbose=self.verbose,
+            n_iter=self.n_iter,
             scoring=self.scoring
         )
 
@@ -89,3 +119,5 @@ class Optimize:
         print(f"Precision Score: {precision}\n")
         print(f"\nROC AUC Score: {rocauc_score}\n")
         print(f"Confusion Matrix: {cm}")
+
+        return bs.best_params_
