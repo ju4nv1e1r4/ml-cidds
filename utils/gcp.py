@@ -15,10 +15,11 @@ class CloudStorageOps:
         Gets the name of the file to be downloaded from the bucket in Google Cloud Storage.
         """
         blob = self.bucket.blob(file_path)
+        logging.info(f"Blob type: {type(blob)}")
         
         try:
             data = blob.download_as_bytes()
-            logging("Data is loaded successfully")
+            logging.info("Data is loaded successfully")
             return data
         except Exception as e:
             logging.error(f"Error downloading file: {e}")
