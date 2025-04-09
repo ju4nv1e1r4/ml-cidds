@@ -1,0 +1,23 @@
+{
+    "accuracy": 0.9996475770925111,
+    "precision": 0.9996398166339228,
+    "recall": 0.9998362481168533,
+    "f1_score": 0.9997380227265285,
+    "roc_auc": 0.9999993368852842,
+    "features": [
+        "duration",
+        "total_packets_used",
+        "bytes_flow",
+        "bytes_per_packet",
+        "packets_per_seconds",
+        "hour_of_day",
+        "is_common_port",
+        "has_SYN",
+        "has_ACK",
+        "has_RST",
+        "has_FIN"
+    ],
+    "training_size": 105932,
+    "test_size": 45400,
+    "timestamp": "2025-04-09T08:09:56.303372"
+}
