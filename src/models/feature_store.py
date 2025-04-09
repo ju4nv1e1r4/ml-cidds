@@ -269,7 +269,7 @@ class FeatureStore:
                 group_df.to_csv(local_path)
                 
                 cloud_path = f"feature_store/{feature_group_id}/{group_name}_v{version}.csv"
-                self.ops.upload_file_to_bucket(local_path, cloud_path)
+                self.ops.upload_to_bucket(local_path, cloud_path)
         
         self.save_metadata(feature_group_id)
         
