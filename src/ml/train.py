@@ -167,9 +167,16 @@ try:
     current_version_path = os.path.join(MODEL_BASE_PATH, "current_version.txt")
     with open(current_version_path, 'w') as f:
         f.write(model_version)
-        
-    logging.info(f"Model saved successfully: {model_path}")
-    logging.info(f"Metatada saved: {metadata_path}")
-    logging.info(f"Model set as current: {current_model_path}")
+
+    logging.info(Fore.GREEN + f"Model saved successfully: {model_path}")
+    logging.info(Fore.GREEN + f"Metatada saved: {metadata_path}")
+    logging.info(Fore.GREEN + f"Model set as current: {current_model_path}")
+
+    model_path_on_bucket = model_path
+    metadata_path_on_bucket = metadata_path
+    gcs.upload_to_bucket(current_model_path, model_path_on_bucket)
+    gcs.upload_to_bucket(metadata_path, metadata_path_on_bucket)
+    logging.info(Fore.BLUE + f"Model saved on bucket: {model_path_on_bucket}")
+    logging.info(Fore.BLUE + f"Metadata saved on bucket: {metadata_path_on_bucket}")
 except Exception as e:
     logging.exception(f"Error saving model: {e}")
