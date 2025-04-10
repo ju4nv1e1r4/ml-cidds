@@ -28,8 +28,11 @@ class CloudStorageOps:
     def list_from_bucket(self):
         """List all files in the bucket"""
         blobs = self.storage_client.list_blobs(self.bucket_name)
+        files = []
         for blob in blobs:
-            print(blob.name)
+            files.append(blob.name)
+        return files
+        
 
     def delete_from_bucket(self, file_path):
         """
@@ -44,7 +47,8 @@ class CloudStorageOps:
         generation_match_precondition = blob.generation
         blob.delete(if_generation_match=generation_match_precondition)
 
-        return logging.info(f"File deleted: '{file_path}'.")
+        logging.info(f"File deleted: '{file_path}'.")
+        return
     
     def upload_to_bucket(self, source_file_name, destination_file_name):
         """
