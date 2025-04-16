@@ -1,5 +1,9 @@
 import structlog
 import logging
+import json
+import os
+from google.auth import jwt
+from google.cloud import pubsub_v1
 from logging.handlers import RotatingFileHandler
 
 class Config:
@@ -23,3 +27,35 @@ class Config:
         )
 
         return structlog.get_logger()
+    
+    def gcp_auth(self):
+        service_account_file = os.environ["GCP_SERVICE_ACCOUNT_FILE"]
+        service_account_info = json.loads(
+            open(service_account_file).read()
+        )
+
+        sub_audience = "https://pubsub.googleapis.com/google.pubsub.v1.Subscriber"
+        pub_audience = "https://pubsub.googleapis.com/google.pubsub.v1.Publisher"
+
+        credentials_pub = jwt.Credentials.from_service_account_info(
+            service_account_info,
+            audience=pub_audience,
+        )
+
+        credentials_sub = jwt.Credentials.from_service_account_info(
+            service_account_info,
+            audience=sub_audience,
+        )
+
+        subscriber = credentials_sub.with_claims(
+            audience=pub_audience
+        )
+
+        publisher = credentials_pub.with_claims(
+            audience=sub_audience
+        )
+
+        pub = pubsub_v1.PublisherClient(credentials=publisher)
+        sub = pubsub_v1.SubscriberClient(credentials=subscriber)
+
+        return pub, sub
