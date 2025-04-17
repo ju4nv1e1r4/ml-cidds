@@ -180,3 +180,7 @@ cython_debug/
 # logs
 data/logs/
 *.json
+
+# datasets
+data/new_data_sup.csv
+data/new_data_unsup.csv
