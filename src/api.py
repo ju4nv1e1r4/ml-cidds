@@ -5,6 +5,7 @@ import pandas as pd
 import os
 from .routes.predict import Model
 from .models.models import SupervisedSessionData, UnsupervisedSessionData
+from utils.gcp import CloudStorageOps
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -26,6 +27,8 @@ def save_inference_log(data: dict, prediction: int, mode: str):
 
     file_exists = os.path.exists(filename)
     df.to_csv(filename, mode="a", header=not file_exists, index=False)
+    gcs = CloudStorageOps("ml-anomaly-detection")
+    gcs.upload_to_bucket(filename, f"src/{filename}")
 
 @app.post("/detect_anomaly")
 def detect_anomaly(payload: RequestPayload):
