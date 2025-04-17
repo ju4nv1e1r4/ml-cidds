@@ -6,8 +6,6 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-_cached_model = None
-
 class Model:
     @staticmethod
     def predict(model, features):
@@ -173,10 +171,7 @@ class Model:
     @staticmethod
     def load_model(supervised=True):
         try:
-            global _cached_model
-            if _cached_model is not None:
-                return _cached_model
-            
+            logging.info("Loading model...")           
             gcs = CloudStorageOps("ml-anomaly-detection")
             model_path = Model.get_latest_model(supervised=supervised)
             model_data = gcs.load_from_bucket(model_path)
@@ -185,8 +180,8 @@ class Model:
                 raise Exception(f"Model data not found at {model_path}")
             
             logging.info(f"Model loaded: {model_path}")
-            _cached_model = pickle.loads(model_data)
-            return _cached_model
+            model = pickle.loads(model_data)
+            return model
         except Exception as load_model_error:
             logging.error(f"Error loading model: {load_model_error}")
             raise load_model_error
