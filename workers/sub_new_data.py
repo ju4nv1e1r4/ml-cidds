@@ -30,7 +30,7 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
 
         filename = "new_data_sup.csv" if mode == "supervised" else "new_data_unsup.csv"
         local_path = f"data/{filename}"
-        remote_path = f"src/{filename}"
+        remote_path = f"src/data/{filename}"
 
         file_exists = os.path.exists(local_path)
         df.to_csv(local_path, mode="a", header=not file_exists, index=False)
