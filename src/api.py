@@ -6,6 +6,7 @@ import os
 from .routes.predict import Model
 from .models.models import SupervisedSessionData, UnsupervisedSessionData
 from utils.gcp import CloudStorageOps
+from workers.pub_new_data import publish_new_data
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -40,7 +41,11 @@ def detect_anomaly(payload: RequestPayload):
             input_data = payload.supervised_data.dict()
             features = Model.build_features_supervised(payload.supervised_data.dict())
             prediction = model.predict([features])
-            save_inference_log(input_data, int(prediction[0]), mode="supervised")
+            publish_new_data({
+                "data": input_data,
+                "prediction": int(prediction[0]),
+                "mode": "supervised"
+            })
 
         elif payload.mode == "unsupervised":
             if payload.unsupervised_data is None:
@@ -49,7 +54,11 @@ def detect_anomaly(payload: RequestPayload):
             input_data = payload.unsupervised_data.dict()
             features = Model.build_features_unsupervised(payload.unsupervised_data.dict())
             prediction = model.predict([features])
-            save_inference_log(input_data, int(prediction[0]), mode="unsupervised")
+            publish_new_data({
+                "data": input_data,
+                "prediction": int(prediction[0]),
+                "mode": "unsupervised"
+            })
 
         logging.info(f"Prediction: {prediction[0]}")
         return {"prediction": int(prediction[0])}
