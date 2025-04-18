@@ -5,9 +5,10 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src /app/src
-COPY data /app/data
-COPY utils /app/utils
-COPY workers /app/workers
+COPY ./src/ /app/src/
+COPY ./data/ /app/data/
+COPY ./utils/ /app/utils/
+COPY ./workers/ /app/workers/
+COPY ./main.py /app/main.py
 
 CMD ["python", "-m", "workers.sub_new_data"]

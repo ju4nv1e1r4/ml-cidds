@@ -5,12 +5,12 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src /app/src
-COPY data /app/data
-COPY tests /app/tests
-COPY utils /app/utils
-COPY workers /app/workers
-COPY main.py /app/main.py
+COPY ./src/ /app/src/
+COPY ./data/ /app/data/
+COPY ./tests/ /app/tests/
+COPY ./utils/ /app/utils/
+COPY ./workers/ /app/workers/
+COPY ./main.py /app/main.py
 
 EXPOSE 8080
 
