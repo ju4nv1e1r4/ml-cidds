@@ -61,7 +61,7 @@ jobs:
         echo "GCP_PUBSUB_TOPIC=${{ secrets.GCP_PUBSUB_TOPIC }}" >> .env
         export "GCP_PUBSUB_SUBSCRIPTION=${{ secrets.GCP_PUBSUB_SUBSCRIPTION }}"
         echo "GCP_PUBSUB_SUBSCRIPTION=${{ secrets.GCP_PUBSUB_SUBSCRIPTION }}" >> .env
-        
+
     - name: List files in the directory (verify if .env exists - DEBUG)
       run: |
         ls -la
