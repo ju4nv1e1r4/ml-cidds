@@ -1,0 +1,10 @@
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]  # E = pycodestyle, F = pyflakes, I = isort
+exclude = ["venv", "__pycache__"]
+
+[tool.mypy]
+ignore_missing_imports = true
