@@ -1,0 +1,22 @@
+substitutions:
+  _IMAGE_TAG_API: gcr.io/$PROJECT_ID/anomaly-detection-api
+  _IMAGE_TAG_SUB: gcr.io/$PROJECT_ID/anomaly-detection-sub
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.api', '-t', '${_IMAGE_TAG_API}', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.sub', '-t', '${_IMAGE_TAG_SUB}', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE_TAG_API}']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE_TAG_SUB}']
+
+images:
+  - '${_IMAGE_TAG_API}'
+  - '${_IMAGE_TAG_SUB}'
+
+logsBucket: 'gs://ml-anomaly-detection/src/logs'
