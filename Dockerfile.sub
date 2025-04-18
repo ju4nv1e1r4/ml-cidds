@@ -11,4 +11,4 @@ COPY ./utils/ /app/utils/
 COPY ./workers/ /app/workers/
 COPY ./main.py /app/main.py
 
-CMD ["python", "-m", "workers.sub_new_data"]
+CMD ["uvicorn", "workers.subscriber:app", "--host", "0.0.0.0", "--port", "8080"]
