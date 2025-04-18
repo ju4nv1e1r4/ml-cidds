@@ -3,7 +3,7 @@ from sklearn.metrics import (
     classification_report,
     recall_score,
     precision_score,
-    f1_score
+    f1_score,
 )
 from sklearn.model_selection import train_test_split
 from google.resumable_media.common import InvalidResponse
@@ -19,7 +19,9 @@ import logging
 from utils.gcp import CloudStorageOps
 
 init(autoreset=True)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 PATH_FILE = "preprocessed/CIDDS-001.csv"
@@ -62,7 +64,10 @@ try:
         random_state=42,
         stratify=y,
     )
-    logging.info(Fore.BLUE + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}")
+    logging.info(
+        Fore.BLUE
+        + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+    )
     print(" ")
 except Exception as split_error:
     logging.error(Fore.RED + f"Error: {split_error}")
@@ -75,10 +80,10 @@ print(" ")
 
 model = IsolationForest(
     n_estimators=100,
-    max_samples='auto',
+    max_samples="auto",
     contamination=0.5,
     max_features=1.0,
-    random_state=42
+    random_state=42,
 )
 
 model.fit(X_train)
@@ -104,30 +109,30 @@ metadata = {
     "features": list(X.columns),
     "training_size": len(X_train),
     "test_size": len(X_test),
-    "timestamp": datetime.datetime.now().isoformat()
+    "timestamp": datetime.datetime.now().isoformat(),
 }
 
 os.makedirs(MODEL_BASE_PATH, exist_ok=True)
-    
+
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 model_version = f"{MODEL_VERSION_PREFIX}{timestamp}"
 
 model_path = os.path.join(MODEL_BASE_PATH, f"{model_version}.pkl")
 
 try:
-    with open(model_path, 'wb') as f:
+    with open(model_path, "wb") as f:
         pickle.dump(model, f)
-    
+
     current_model_path = os.path.join(MODEL_BASE_PATH, MODEL_FILENAME)
-    with open(current_model_path, 'wb') as f:
+    with open(current_model_path, "wb") as f:
         pickle.dump(model, f)
-    
+
     metadata_path = os.path.join(MODEL_BASE_PATH, f"{model_version}_metadata.json")
-    with open(metadata_path, 'w') as f:
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=4)
-        
+
     current_version_path = os.path.join(MODEL_BASE_PATH, "current_version.txt")
-    with open(current_version_path, 'w') as f:
+    with open(current_version_path, "w") as f:
         f.write(model_version)
 
     logging.info(Fore.GREEN + f"Model saved successfully: {model_path}")

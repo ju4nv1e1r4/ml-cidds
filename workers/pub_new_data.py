@@ -12,6 +12,7 @@ TOPIC_ID = os.getenv("GCP_PUBSUB_TOPIC")
 
 TOPIC_PATH = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
+
 def publish_new_data(data: dict):
     message_json = json.dumps(data)
     message_bytes = message_json.encode("utf-8")

@@ -7,12 +7,25 @@ from sklearn.metrics import (
     roc_auc_score,
     classification_report,
     confusion_matrix,
-    f1_score
+    f1_score,
 )
 
 
 class Optimize:
-    def __init__(self, model, param_grid, X_train, X_test, y_train, y_test, cv, verbose=1, n_iter=25, scoring="recall", thresholds=None, ):
+    def __init__(
+        self,
+        model,
+        param_grid,
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+        cv,
+        verbose=1,
+        n_iter=25,
+        scoring="recall",
+        thresholds=None,
+    ):
         self.model = model
         self.param_grid = param_grid
         self.X_train = X_train
@@ -28,9 +41,9 @@ class Optimize:
             "precision": 0.8,
             "f1_score": 0.8,
             "accuracy": 0.8,
-            "roc_auc": 0.8
+            "roc_auc": 0.8,
         }
-    
+
     def refine_param_grid(self, best_params, spread=0.2):
         """
         Cria um novo grid em torno dos melhores parâmetros encontrados.
@@ -44,9 +57,14 @@ class Optimize:
                 max_val = best_val * (1 + spread)
 
                 if isinstance(best_val, int):
-                    new_grid[param] = list(range(max(int(min_val), 1), int(max_val) + 1))
+                    new_grid[param] = list(
+                        range(max(int(min_val), 1), int(max_val) + 1)
+                    )
                 else:
-                    new_grid[param] = (min_val, max_val)  # formato contínuo para bayessearchcv
+                    new_grid[param] = (
+                        min_val,
+                        max_val,
+                    )  # formato contínuo para bayessearchcv
             else:
                 # parâmetro categórico
                 new_grid[param] = [best_val]
@@ -61,13 +79,10 @@ class Optimize:
             n_jobs=2,
             verbose=self.verbose,
             n_iter=self.n_iter,
-            scoring=self.scoring
+            scoring=self.scoring,
         )
 
-        rs.fit(
-           self.X_train,
-           self.y_train
-        )
+        rs.fit(self.X_train, self.y_train)
 
         best_model = rs.best_estimator_
         predictions = best_model.predict(self.X_test)
@@ -101,13 +116,10 @@ class Optimize:
             n_jobs=2,
             verbose=self.verbose,
             n_iter=self.n_iter,
-            scoring=self.scoring
+            scoring=self.scoring,
         )
 
-        bs.fit(
-            self.X_train,
-            self.y_train
-        )
+        bs.fit(self.X_train, self.y_train)
 
         best_model = bs.best_estimator_
         predictions = best_model.predict(self.X_test)
@@ -131,13 +143,15 @@ class Optimize:
         print(f"Confusion Matrix: {cm}")
 
         if (
-            recall >= self.thresholds.get("recall", 0) and
-            precision >= self.thresholds.get("precision", 0) and
-            accuracy >= self.thresholds.get("accuracy", 0) and
-            f1 >= self.thresholds.get("f1_score", 0) and
-            rocauc_score >= self.thresholds.get("roc_auc", 0)
+            recall >= self.thresholds.get("recall", 0)
+            and precision >= self.thresholds.get("precision", 0)
+            and accuracy >= self.thresholds.get("accuracy", 0)
+            and f1 >= self.thresholds.get("f1_score", 0)
+            and rocauc_score >= self.thresholds.get("roc_auc", 0)
         ):
             return bs.best_params_
         else:
-            print("Metrics are not good enough. Check your steps before this optimization.")
+            print(
+                "Metrics are not good enough. Check your steps before this optimization."
+            )
             return {}

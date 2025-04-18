@@ -8,13 +8,16 @@ import logging
 
 dotenv.load_dotenv()
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 SUBSCRIPTION_ID = os.getenv("GCP_PUBSUB_SUBSCRIPTION")
 subscriber = pubsub_v1.SubscriberClient()
 
 SUBSCRIPTION_PATH = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
+
 
 def callback(message: pubsub_v1.subscriber.message.Message) -> None:
     try:
@@ -45,6 +48,7 @@ def callback(message: pubsub_v1.subscriber.message.Message) -> None:
         logging.error(f"Error processing message: {publish_error}")
         message.nack()
 
+
 def main():
     logging.info("Starting subscriber...")
     streaming_pull_future = subscriber.subscribe(SUBSCRIPTION_PATH, callback=callback)
@@ -55,6 +59,7 @@ def main():
     except KeyboardInterrupt:
         streaming_pull_future.cancel()
         logging.info("Subscriber stopped.")
+
 
 if __name__ == "__main__":
     main()

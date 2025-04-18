@@ -3,11 +3,14 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 
 def test_load_dataset(load):
     df = load.load_dataset()
     assert isinstance(df, pd.DataFrame)
+
 
 def test_split_dataset(load):
     df = load.load_dataset()

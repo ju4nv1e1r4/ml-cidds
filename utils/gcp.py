@@ -1,7 +1,10 @@
 from google.cloud import storage
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class CloudStorageOps:
     def __init__(self, bucket_name):
@@ -16,7 +19,7 @@ class CloudStorageOps:
         """
         blob = self.bucket.blob(file_path)
         logging.info(f"Blob type: {type(blob)}")
-        
+
         try:
             data = blob.download_as_bytes()
             logging.info("Data is loaded successfully")
@@ -32,7 +35,6 @@ class CloudStorageOps:
         for blob in blobs:
             files.append(blob.name)
         return files
-        
 
     def delete_from_bucket(self, file_path):
         """
@@ -49,7 +51,7 @@ class CloudStorageOps:
 
         logging.info(f"File deleted: '{file_path}'.")
         return
-    
+
     def upload_to_bucket(self, source_file_name, destination_file_name):
         """
         Upload a file to a Google Cloud Storage bucket

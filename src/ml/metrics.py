@@ -2,14 +2,17 @@ import os
 import time
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-class SystemMetrics():
+
+class SystemMetrics:
     def __init__(self):
         pass
 
     def model_size(self):
-        model_path = "model-here.pkl" # *** ALTER MODEL HERE ***
+        model_path = "model-here.pkl"  # *** ALTER MODEL HERE ***
         size_mb = os.path.getsize(model_path) / (1024 * 1024)
         logging.info(f"Model size: {size_mb:.2f}MB")
         return size_mb

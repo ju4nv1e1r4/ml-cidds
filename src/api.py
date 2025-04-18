@@ -9,17 +9,24 @@ from utils.gcp import CloudStorageOps
 from workers.pub_new_data import publish_new_data
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class RequestPayload(BaseModel):
     mode: Literal["supervised", "unsupervised"]
     supervised_data: Optional[SupervisedSessionData] = None
     unsupervised_data: Optional[UnsupervisedSessionData] = None
 
+
 app = FastAPI()
 
+
 def save_inference_log(data: dict, prediction: int, mode: str):
-    filename = "data/new_data_sup.csv" if mode == "supervised" else "data/new_data_unsup.csv"
+    filename = (
+        "data/new_data_sup.csv" if mode == "supervised" else "data/new_data_unsup.csv"
+    )
 
     data_with_prediction = data.copy()
     data_with_prediction["prediction"] = prediction
@@ -31,34 +38,45 @@ def save_inference_log(data: dict, prediction: int, mode: str):
     gcs = CloudStorageOps("ml-anomaly-detection")
     gcs.upload_to_bucket(filename, f"src/{filename}")
 
+
 @app.post("/detect_anomaly")
 def detect_anomaly(payload: RequestPayload):
     try:
         if payload.mode == "supervised":
             if payload.supervised_data is None:
-                raise HTTPException(status_code=400, detail="Missing data for supervised mode.")
+                raise HTTPException(
+                    status_code=400, detail="Missing data for supervised mode."
+                )
             model = Model.load_model(supervised=True)
             input_data = payload.supervised_data.dict()
             features = Model.build_features_supervised(payload.supervised_data.dict())
             prediction = model.predict([features])
-            publish_new_data({
-                "data": input_data,
-                "prediction": int(prediction[0]),
-                "mode": "supervised"
-            })
+            publish_new_data(
+                {
+                    "data": input_data,
+                    "prediction": int(prediction[0]),
+                    "mode": "supervised",
+                }
+            )
 
         elif payload.mode == "unsupervised":
             if payload.unsupervised_data is None:
-                raise HTTPException(status_code=400, detail="Missing data for unsupervised mode.")
+                raise HTTPException(
+                    status_code=400, detail="Missing data for unsupervised mode."
+                )
             model = Model.load_model(supervised=False)
             input_data = payload.unsupervised_data.dict()
-            features = Model.build_features_unsupervised(payload.unsupervised_data.dict())
+            features = Model.build_features_unsupervised(
+                payload.unsupervised_data.dict()
+            )
             prediction = model.predict([features])
-            publish_new_data({
-                "data": input_data,
-                "prediction": int(prediction[0]),
-                "mode": "unsupervised"
-            })
+            publish_new_data(
+                {
+                    "data": input_data,
+                    "prediction": int(prediction[0]),
+                    "mode": "unsupervised",
+                }
+            )
 
         logging.info(f"Prediction: {prediction[0]}")
         return {"prediction": int(prediction[0])}

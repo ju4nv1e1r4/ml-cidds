@@ -3,7 +3,7 @@ from sklearn.metrics import (
     classification_report,
     recall_score,
     precision_score,
-    f1_score
+    f1_score,
 )
 from sklearn.model_selection import train_test_split
 from google.resumable_media.common import InvalidResponse
@@ -15,7 +15,9 @@ import logging
 from utils.gcp import CloudStorageOps
 
 init(autoreset=True)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 PATH_FILE = "preprocessed/CIDDS-001.csv"
@@ -58,7 +60,10 @@ try:
         random_state=42,
         stratify=y,
     )
-    logging.info(Fore.BLUE + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}")
+    logging.info(
+        Fore.BLUE
+        + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+    )
     print(" ")
 except Exception as split_error:
     logging.error(Fore.RED + f"Error: {split_error}")
@@ -71,10 +76,10 @@ print(" ")
 
 model = IsolationForest(
     n_estimators=100,
-    max_samples='auto',
+    max_samples="auto",
     contamination=0.5,
     max_features=1.0,
-    random_state=42
+    random_state=42,
 )
 
 model.fit(X_train)

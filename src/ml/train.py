@@ -9,7 +9,7 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     confusion_matrix,
-    classification_report
+    classification_report,
 )
 from google.resumable_media.common import InvalidResponse
 import pickle
@@ -25,7 +25,9 @@ from utils.constants import Config
 from utils.gcp import CloudStorageOps
 
 init(autoreset=True)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 c = Config()
 logger = c.logger
 
@@ -49,9 +51,17 @@ except FileNotFoundError as file_error:
 
 try:
     safe_features = [
-        "duration", "total_packets_used", "bytes_flow", "bytes_per_packet",
-        "packets_per_seconds", "hour_of_day", "is_common_port",
-        "has_SYN", "has_ACK", "has_RST", "has_FIN"
+        "duration",
+        "total_packets_used",
+        "bytes_flow",
+        "bytes_per_packet",
+        "packets_per_seconds",
+        "hour_of_day",
+        "is_common_port",
+        "has_SYN",
+        "has_ACK",
+        "has_RST",
+        "has_FIN",
     ]
     X = df[safe_features]
     y = df["is_attack"]
@@ -61,15 +71,13 @@ except Exception as cols_error:
 
 try:
     X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.3,
-        random_state=42,
-        stratify=y,
-        shuffle=True
+        X, y, test_size=0.3, random_state=42, stratify=y, shuffle=True
     )
     y_train_shuffled = shuffle(y_train, random_state=42)
-    logging.info(Fore.BLUE + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}")
+    logging.info(
+        Fore.BLUE
+        + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+    )
 except Exception as split_error:
     logging.error(Fore.RED + f"Error: {split_error}")
 
@@ -84,7 +92,7 @@ try:
         max_depth=20,
         max_features="sqrt",
         criterion="gini",
-        bootstrap=False
+        bootstrap=False,
     )
     model.fit(X_train, y_train_shuffled)
     logging.info(Fore.GREEN + "Model training is complete.")
@@ -121,7 +129,7 @@ model_metrics = {
     "precision": precision,
     "recall": recall,
     "fi_score": f1,
-    "roc_auc_score": rocauc
+    "roc_auc_score": rocauc,
 }
 
 logger.info(MODEL_METRICS_PATH, **model_metrics)
@@ -142,30 +150,30 @@ metadata = {
     "features": list(X.columns),
     "training_size": len(X_train),
     "test_size": len(X_test),
-    "timestamp": datetime.datetime.now().isoformat()
+    "timestamp": datetime.datetime.now().isoformat(),
 }
 
 os.makedirs(MODEL_BASE_PATH, exist_ok=True)
-    
+
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 model_version = f"{MODEL_VERSION_PREFIX}{timestamp}"
 
 model_path = os.path.join(MODEL_BASE_PATH, f"{model_version}.pkl")
 
 try:
-    with open(model_path, 'wb') as f:
+    with open(model_path, "wb") as f:
         pickle.dump(model, f)
-    
+
     current_model_path = os.path.join(MODEL_BASE_PATH, MODEL_FILENAME)
-    with open(current_model_path, 'wb') as f:
+    with open(current_model_path, "wb") as f:
         pickle.dump(model, f)
-    
+
     metadata_path = os.path.join(MODEL_BASE_PATH, f"{model_version}_metadata.json")
-    with open(metadata_path, 'w') as f:
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=4)
-        
+
     current_version_path = os.path.join(MODEL_BASE_PATH, "current_version.txt")
-    with open(current_version_path, 'w') as f:
+    with open(current_version_path, "w") as f:
         f.write(model_version)
 
     logging.info(Fore.GREEN + f"Model saved successfully: {model_path}")

@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Literal
 from datetime import datetime
 
+
 class SupervisedSessionData(BaseModel):
     start_session: str
     end_session: str
@@ -9,6 +10,7 @@ class SupervisedSessionData(BaseModel):
     bytes: int
     source_port: float
     flag: str
+
 
 class UnsupervisedSessionData(BaseModel):
     start_session: str

@@ -7,7 +7,7 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     confusion_matrix,
-    classification_report
+    classification_report,
 )
 from colorama import init, Fore
 import datetime
@@ -23,7 +23,9 @@ from utils.constants import Config
 from utils.gcp import CloudStorageOps
 
 init(autoreset=True)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 c = Config()
 logger = c.logger
 gcs = CloudStorageOps("ml-anomaly-detection")
@@ -38,9 +40,9 @@ X_train, X_test, y_train, y_test = data.split_dataset(df)
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 param_grid = {
-    'n_estimators': [50, 100, 200],
-    'max_depth': [5, 10, 20, None],
-    'min_samples_split': [2, 5, 10]
+    "n_estimators": [50, 100, 200],
+    "max_depth": [5, 10, 20, None],
+    "min_samples_split": [2, 5, 10],
 }
 
 my_thresholds = {
@@ -62,7 +64,7 @@ opt = Optimize(
     verbose=0,
     n_iter=1,
     scoring="recall",
-    thresholds=my_thresholds
+    thresholds=my_thresholds,
 )
 
 logging.info("===== Randomized Search =====")
@@ -82,7 +84,7 @@ try:
         max_depth=20,
         max_features="sqrt",
         criterion="gini",
-        bootstrap=False
+        bootstrap=False,
     )
     model.fit(X_train, y_train)
     logging.info(Fore.GREEN + "Model training is complete.")
@@ -119,7 +121,7 @@ model_metrics = {
     "precision": precision,
     "recall": recall,
     "f1_score": f1,
-    "roc_auc_score": rocauc
+    "roc_auc_score": rocauc,
 }
 
 logger.info(MODEL_METRICS_PATH, **model_metrics)
@@ -140,30 +142,30 @@ metadata = {
     "features": list(X_train.columns),
     "training_size": len(X_train),
     "test_size": len(X_test),
-    "timestamp": datetime.datetime.now().isoformat()
+    "timestamp": datetime.datetime.now().isoformat(),
 }
 
 os.makedirs(MODEL_BASE_PATH, exist_ok=True)
-    
+
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 model_version = f"{MODEL_VERSION_PREFIX}{timestamp}"
 
 model_path = os.path.join(MODEL_BASE_PATH, f"{model_version}.pkl")
 
 try:
-    with open(model_path, 'wb') as f:
+    with open(model_path, "wb") as f:
         pickle.dump(model, f)
-    
+
     current_model_path = os.path.join(MODEL_BASE_PATH, MODEL_FILENAME)
-    with open(current_model_path, 'wb') as f:
+    with open(current_model_path, "wb") as f:
         pickle.dump(model, f)
-    
+
     metadata_path = os.path.join(MODEL_BASE_PATH, f"{model_version}_metadata.json")
-    with open(metadata_path, 'w') as f:
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=4)
-        
+
     current_version_path = os.path.join(MODEL_BASE_PATH, "current_version.txt")
-    with open(current_version_path, 'w') as f:
+    with open(current_version_path, "w") as f:
         f.write(model_version)
 
     logging.info(Fore.GREEN + f"Model saved successfully: {model_path}")
