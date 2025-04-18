@@ -1,0 +1,88 @@
+name: Build and Deploy Anoamaly Detection Service
+
+on:
+  push:
+    branches:
+      - prod
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  RUN_REGION: us-central1
+  IMAGE_TAG_API: gcr.io/${{ secrets.GCP_PROJECT_ID }}/anomaly-detection-api:${{ github.sha }}
+  IMAGE_TAG_SUB: gcr.io/${{ secrets.GCP_PROJECT_ID }}/anomaly-detection-sub:${{ github.sha }}
+
+jobs:
+  setup-build-deploy:
+    name: Setup, Build, and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+    - name: Set up gcloud
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+        install_components: 'beta'
+
+    - name: Verify gcloud configuration
+      run: |
+        gcloud config list
+        gcloud info
+
+    - name: List files in the current directory
+      run: |
+        ls -la
+
+    - name: Print Environment Variables
+      run: |
+        echo "PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}"
+        echo "SERVICE_NAME=${{ secrets.API_SERVICE_NAME }}"
+        echo "SERVICE_NAME=${{ secrets.SUB_SERVICE_NAME }}"
+        echo "GITHUB_SHA=${GITHUB_SHA}"
+
+    - name: Submit build to Cloud Build
+      run: |
+        gcloud builds submit \
+          --config cloudbuild.yaml \
+          --substitutions=_IMAGE_TAG_API=$IMAGE_TAG_API,_IMAGE_TAG_SUB=$IMAGE_TAG_SUB
+
+    - name: Create .env file
+      run: |
+        export "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}"
+        echo "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" > .env
+        export "GCP_PUBSUB_TOPIC=${{ secrets.GCP_PUBSUB_TOPIC }}"
+        echo "GCP_PUBSUB_TOPIC=${{ secrets.GCP_PUBSUB_TOPIC }}" >> .env
+        export "GCP_PUBSUB_SUBSCRIPTION=${{ secrets.GCP_PUBSUB_SUBSCRIPTION }}"
+        echo "GCP_PUBSUB_SUBSCRIPTION=${{ secrets.GCP_PUBSUB_SUBSCRIPTION }}" >> .env
+        
+    - name: List files in the directory (verify if .env exists - DEBUG)
+      run: |
+        ls -la
+        cat .env
+    
+    - name: Deploy API to Cloud Run
+      run: |-
+        gcloud run deploy ${{ secrets.API_SERVICE_NAME }} \
+          --image ${{ env.IMAGE_TAG_API }} \
+          --platform managed \
+          --region "$RUN_REGION" \
+          --allow-unauthenticated \
+          --timeout=300s \
+          --set-env-vars-file .env \
+
+    - name: Deploy Subscriber to Cloud Run
+      run: |-
+        gcloud run deploy ${{ secrets.SUB_SERVICE_NAME }} \
+          --image ${{ env.IMAGE_TAG_SUB }} \
+          --platform managed \
+          --region "$RUN_REGION" \
+          --allow-unauthenticated \
+          --timeout=300s \
+          --set-env-vars-file .env \
