@@ -182,7 +182,7 @@ class Model:
 
             logging.info(f"Model loaded: {model_path}")
             model = pickle.loads(model_data)
-            return model, model_path
+            return model
         except Exception as load_model_error:
             logging.error(f"Error loading model: {load_model_error}")
             raise load_model_error

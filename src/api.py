@@ -74,7 +74,12 @@ def detect_anomaly(payload: RequestPayload):
                 raise HTTPException(
                     status_code=400, detail="Missing data for supervised mode."
                 )
-            model, model_path = Model.load_model(supervised=True)
+            model = Model.load_model(supervised=True)
+            model_path = Model.get_latest_model(supervised=True)
+            if model_path is None:
+                raise HTTPException(
+                    status_code=500, detail="No model found in the bucket."
+                )
             input_data = payload.supervised_data.dict()
             features = Model.build_features_supervised(payload.supervised_data.dict())
             prediction = model.predict([features])
@@ -103,7 +108,12 @@ def detect_anomaly(payload: RequestPayload):
                 raise HTTPException(
                     status_code=400, detail="Missing data for unsupervised mode."
                 )
-            model, model_path = Model.load_model(supervised=False)
+            model = Model.load_model(supervised=False)
+            model_path = Model.get_latest_model(supervised=False)
+            if model_path is None:
+                raise HTTPException(
+                    status_code=500, detail="No model found in the bucket."
+                )
             input_data = payload.unsupervised_data.dict()
             features = Model.build_features_unsupervised(
                 payload.unsupervised_data.dict()
