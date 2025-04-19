@@ -175,7 +175,16 @@ cython_debug/
 .pypirc
 
 # Binaries
-*.pkl
+src/artifacts/model.pkl
+src/artifacts/unsupervised_model.pkl
+src/artifacts/model_v20250409_080956.pkl
+src/artifacts/model_v20250409_081244.pkl
+src/artifacts/model_v20250409_091703.pkl
+src/artifacts/model_v20250409_091823.pkl
+src/artifacts/model_v20250409_092109.pkl
+src/artifacts/model_v20250409_092346.pkl
+src/artifacts/model_v20250409_153003.pkl
+src/artifacts/unsupervised_model_v20250409_111201.pkl
 
 # logs
 data/logs/
