@@ -1,13 +1,17 @@
+import logging
+import os
+from typing import Literal, Optional
+
+import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Literal, Optional
-import pandas as pd
-import os
-from .routes.predict import Model
-from .models.models import SupervisedSessionData, UnsupervisedSessionData
+
+from src.ml.metrics import SystemMetrics
 from utils.gcp import CloudStorageOps
 from workers.pub_new_data import publish_new_data
-import logging
+
+from .models.models import SupervisedSessionData, UnsupervisedSessionData
+from .routes.predict import Model
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -20,7 +24,23 @@ class RequestPayload(BaseModel):
     unsupervised_data: Optional[UnsupervisedSessionData] = None
 
 
-app = FastAPI()
+class ResponseModel(BaseModel):
+    prediction: int
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "prediction": 1,
+            }
+        }
+
+
+app = FastAPI(
+    title="Anomaly Detection API",
+    description="API for detecting anomalies in data using machine learning models.",
+    version="0.1.1",
+    contact={"name": "Juan Vieira", "url": "https://www.linkedin.com/in/juanvieira85/"},
+)
 
 
 def save_inference_log(data: dict, prediction: int, mode: str):
@@ -39,7 +59,14 @@ def save_inference_log(data: dict, prediction: int, mode: str):
     gcs.upload_to_bucket(filename, f"src/{filename}")
 
 
-@app.post("/detect_anomaly")
+@app.post(
+    "/detect_anomaly",
+    response_model=ResponseModel,
+    summary="""
+    Detect anomalies in data using both machine learning models,
+    supervised and unsupervised.
+    """,
+)
 def detect_anomaly(payload: RequestPayload):
     try:
         if payload.mode == "supervised":
@@ -47,7 +74,7 @@ def detect_anomaly(payload: RequestPayload):
                 raise HTTPException(
                     status_code=400, detail="Missing data for supervised mode."
                 )
-            model = Model.load_model(supervised=True)
+            model, model_path = Model.load_model(supervised=True)
             input_data = payload.supervised_data.dict()
             features = Model.build_features_supervised(payload.supervised_data.dict())
             prediction = model.predict([features])
@@ -58,13 +85,25 @@ def detect_anomaly(payload: RequestPayload):
                     "mode": "supervised",
                 }
             )
+            metrics = SystemMetrics(
+                infer_function=model.predict,
+                model_path=model_path,
+                sample_data=[features],
+            )
+
+            local_metrics_path, metrics_filename = metrics.export_metrics(
+                mode=payload.mode
+            )
+
+            gcs = CloudStorageOps("ml-anomaly-detection")
+            gcs.upload_to_bucket(local_metrics_path, f"metrics/{metrics_filename}")
 
         elif payload.mode == "unsupervised":
             if payload.unsupervised_data is None:
                 raise HTTPException(
                     status_code=400, detail="Missing data for unsupervised mode."
                 )
-            model = Model.load_model(supervised=False)
+            model, model_path = Model.load_model(supervised=False)
             input_data = payload.unsupervised_data.dict()
             features = Model.build_features_unsupervised(
                 payload.unsupervised_data.dict()
@@ -77,6 +116,18 @@ def detect_anomaly(payload: RequestPayload):
                     "mode": "unsupervised",
                 }
             )
+            metrics = SystemMetrics(
+                infer_function=model.predict,
+                model_path=model_path,
+                sample_data=[features],
+            )
+
+            local_metrics_path, metrics_filename = metrics.export_metrics(
+                mode=payload.mode
+            )
+
+            gcs = CloudStorageOps("ml-anomaly-detection")
+            gcs.upload_to_bucket(local_metrics_path, f"metrics/{metrics_filename}")
 
         logging.info(f"Prediction: {prediction[0]}")
         return {"prediction": int(prediction[0])}
