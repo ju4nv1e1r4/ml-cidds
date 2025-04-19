@@ -1,4 +1,4 @@
-name: Build and Deploy Anoamaly Detection Service
+name: Build and Deploy Anomaly Detection Service
 
 on:
   push:
