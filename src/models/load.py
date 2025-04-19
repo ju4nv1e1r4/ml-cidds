@@ -1,10 +1,11 @@
-from google.resumable_media.common import InvalidResponse
-from colorama import init, Fore
-from sklearn.utils import shuffle
-from sklearn.model_selection import train_test_split
-import pandas as pd
-import logging
 import io
+import logging
+
+import pandas as pd
+from colorama import Fore, init
+from google.resumable_media.common import InvalidResponse
+from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 
 from utils.gcp import CloudStorageOps
 
@@ -67,7 +68,10 @@ class Load:
             y_train_shuffled = shuffle(y_train, random_state=42)
             logging.info(
                 Fore.BLUE
-                + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+                + f"""
+                Data successfully splitted -> Train: 
+                {X_train.shape}; Test: {X_test.shape}
+                """
             )
             return X_train, X_test, y_train_shuffled, y_test
         except Exception as split_error:

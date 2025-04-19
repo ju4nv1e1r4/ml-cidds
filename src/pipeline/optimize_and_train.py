@@ -1,21 +1,22 @@
-from sklearn.model_selection import StratifiedKFold
+import datetime
+import json
+import logging
+import os
+import pickle
+import time
+
+from colorama import Fore, init
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
-    recall_score,
-    precision_score,
-    f1_score,
-    roc_auc_score,
-    confusion_matrix,
     classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
-from colorama import init, Fore
-import datetime
-import time
-import logging
-import json
-import pickle
-import os
+from sklearn.model_selection import StratifiedKFold
 
 from src.ml.optmize import Optimize
 from src.models.load import Load

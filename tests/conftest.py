@@ -1,6 +1,7 @@
 import pytest
-from utils.gcp import CloudStorageOps
+
 from src.models.load import Load
+from utils.gcp import CloudStorageOps
 
 
 @pytest.fixture(scope="session")

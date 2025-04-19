@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 import dotenv
 from google.cloud import pubsub_v1
 

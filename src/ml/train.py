@@ -1,25 +1,26 @@
+import datetime
+import io
+import json
+import logging
+import os
+import pickle
+import time
+
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
+from colorama import Fore, init
+from google.resumable_media.common import InvalidResponse
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
-    recall_score,
-    precision_score,
-    f1_score,
-    roc_auc_score,
-    confusion_matrix,
     classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
-from google.resumable_media.common import InvalidResponse
-import pickle
-import logging
-from colorama import Fore, init
-import datetime
-import time
-import io
-import os
-import json
+from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 
 from utils.constants import Config
 from utils.gcp import CloudStorageOps
@@ -76,7 +77,7 @@ try:
     y_train_shuffled = shuffle(y_train, random_state=42)
     logging.info(
         Fore.BLUE
-        + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+        + f"Data successfully splitted -> Train: {X_train.shape}; Test: {X_test.shape}"
     )
 except Exception as split_error:
     logging.error(Fore.RED + f"Error: {split_error}")

@@ -1,9 +1,10 @@
-import os
-import io
 import datetime
 import hashlib
+import io
 import json
 import logging
+import os
+
 import pandas as pd
 
 from utils.gcp import CloudStorageOps
@@ -272,7 +273,10 @@ class FeatureStore:
                     f"{feature_group_id}_{group_name}", group_df
                 )
                 print(
-                    f"  - Group {group_name}: version {version}, {len(group_df)} rows, {len(valid_columns)} cols"
+                    f"""
+                    - Group {group_name}: version {version},
+                    {len(group_df)} rows, {len(valid_columns)} cols
+                    """
                 )
 
                 local_path = f"load/feature_store/{group_name}.csv"

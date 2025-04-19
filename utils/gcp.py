@@ -1,5 +1,6 @@
-from google.cloud import storage
 import logging
+
+from google.cloud import storage
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -15,7 +16,7 @@ class CloudStorageOps:
     def load_from_bucket(self, file_path: str):
         """
         Downloads a file from the bucket and returns the bytes
-        Gets the name of the file to be downloaded from the bucket in Google Cloud Storage.
+        Gets the name of the file to be downloaded from the bucket in GCS.
         """
         blob = self.bucket.blob(file_path)
         logging.info(f"Blob type: {type(blob)}")

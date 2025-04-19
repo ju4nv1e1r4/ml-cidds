@@ -1,12 +1,13 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.utils import shuffle
-from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
-from google.resumable_media.common import InvalidResponse
-import logging
-from colorama import Fore, init
 import io
+import logging
+
+import pandas as pd
+from colorama import Fore, init
+from google.resumable_media.common import InvalidResponse
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.utils import shuffle
+from xgboost import XGBClassifier
 
 from src.ml.optmize import Optimize
 from utils.gcp import CloudStorageOps
@@ -65,7 +66,7 @@ try:
     y_train_shuffled = shuffle(y_train, random_state=42)
     logging.info(
         Fore.BLUE
-        + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+        + f"Data successfully splitted -> Train: {X_train.shape}; Test: {X_test.shape}"
     )
 except Exception as split_error:
     logging.error(Fore.RED + f"Error: {split_error}")

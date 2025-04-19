@@ -1,14 +1,14 @@
-from sklearn.model_selection import RandomizedSearchCV
-from skopt import BayesSearchCV
 from sklearn.metrics import (
     accuracy_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
     classification_report,
     confusion_matrix,
     f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
+from sklearn.model_selection import RandomizedSearchCV
+from skopt import BayesSearchCV
 
 
 class Optimize:
@@ -152,6 +152,9 @@ class Optimize:
             return bs.best_params_
         else:
             print(
-                "Metrics are not good enough. Check your steps before this optimization."
+                """
+                Metrics are not good enough.
+                Check your steps before this optimization.
+                """
             )
             return {}

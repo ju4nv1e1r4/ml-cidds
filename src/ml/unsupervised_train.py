@@ -1,20 +1,21 @@
+import datetime
+import io
+import json
+import logging
+import os
+import pickle
+
+import pandas as pd
+from colorama import Fore, init
+from google.resumable_media.common import InvalidResponse
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import (
     classification_report,
-    recall_score,
-    precision_score,
     f1_score,
+    precision_score,
+    recall_score,
 )
 from sklearn.model_selection import train_test_split
-from google.resumable_media.common import InvalidResponse
-from colorama import Fore, init
-import pandas as pd
-import io
-import os
-import json
-import pickle
-import datetime
-import logging
 
 from utils.gcp import CloudStorageOps
 
@@ -66,7 +67,7 @@ try:
     )
     logging.info(
         Fore.BLUE
-        + f"Data successfully splitted -> Train: {X_train.shape} || Test: {X_test.shape}"
+        + f"Data successfully splitted -> Train: {X_train.shape}; Test: {X_test.shape}"
     )
     print(" ")
 except Exception as split_error:

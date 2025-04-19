@@ -1,10 +1,11 @@
-import structlog
-import logging
 import json
+import logging
 import os
+from logging.handlers import RotatingFileHandler
+
+import structlog
 from google.auth import jwt
 from google.cloud import pubsub_v1
-from logging.handlers import RotatingFileHandler
 
 
 class Config:
