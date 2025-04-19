@@ -1,8 +1,9 @@
-import re
-import pickle
-from datetime import datetime
-from utils.gcp import CloudStorageOps
 import logging
+import pickle
+import re
+from datetime import datetime
+
+from utils.gcp import CloudStorageOps
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -137,9 +138,9 @@ class Model:
             gcs = CloudStorageOps("ml-anomaly-detection")
             all_files = gcs.list_from_bucket()
 
-            if supervised == True:
+            if supervised:
                 model_prefix = f"{prefix}model_v"
-            elif supervised == False:
+            else:
                 model_prefix = f"{prefix}unsupervised_model_v"
 
             model_files = [
@@ -181,7 +182,7 @@ class Model:
 
             logging.info(f"Model loaded: {model_path}")
             model = pickle.loads(model_data)
-            return model
+            return model, model_path
         except Exception as load_model_error:
             logging.error(f"Error loading model: {load_model_error}")
             raise load_model_error
