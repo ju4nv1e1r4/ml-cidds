@@ -185,8 +185,52 @@ Isso sugere que **as features excluídas tinham alta capacidade de separação**
 
 ### Melhor resultado até agora:
 **`contamination=0.5` com 17 features**: Melhor F1, ótimo recall e precisão.
-  
 
+---
+
+## Modelos em Produção com API + Mensageria para Retreino
+
+A partir de agora, **ambos os modelos (supervisionado e não-supervisionado)** estão disponíveis **em produção via uma API com FastAPI**, hospedada no **Google Cloud Run**.
+
+### Documentação Swagger da API
+- Acesse aqui: [Swagger UI](https://anomaly-detection-api-1049636244984.us-central1.run.app/docs)
+
+### ⚙️ Como funciona:
+- A API possui **um único endpoint**, onde o usuário envia os dados de rede.
+- É possível escolher **qual modelo será usado para a predição** (`RandomForest` ou `IsolationForest`).
+- A resposta contém a predição: `0` ou `1` para o modelo supervisionado e `0` `-1` para o  modelo não-supervisionado.
+
+---
+
+## 📨 Sistema de Mensageria: Pub/Sub + Storage para Retreino
+
+### Objetivo:
+- **Todos os dados de entrada enviados à API também são armazenados** para uso futuro em retreino do modelo.
+
+### Pipeline:
+1. **A API publica os dados recebidos** em um tópico do **Google Cloud Pub/Sub**.
+2. Um serviço **subscriber (também deployado no Cloud Run)** escuta esse tópico.
+3. O subscriber **salva os dados recebidos em formato `.csv` em uma Google Cloud Storage bucket**.
+4. Esses dados armazenados serão usados para **retreinar os modelos com novos padrões de tráfego de rede**.
+
+---
+
+## 📈 Monitoramento
+
+A API também conta com **monitoramento de métricas operacionais**, como:
+- **Latência** (tempo de resposta da predição)
+- **Throughput** (número de requisições por segundo)
+- **Tamanho do modelo (em MB)**
+
+---
+
+## ✅ Benefícios dessa arquitetura
+
+- **Alta disponibilidade** com Google Cloud Run.
+- **Escalabilidade automática** da API e do serviço subscriber.
+- **Ciclo contínuo de melhoria dos modelos**, com coleta automática de novos dados reais.
+- **Rastreabilidade**: cada input é logado e salvo com segurança.
+- **Flexibilidade**: escolha entre detecção conservadora (RandomForest) ou balanceada (IsolationForest).
 ---
 
 ### Produto final
@@ -198,3 +242,6 @@ Isso sugere que **as features excluídas tinham alta capacidade de separação**
 -  Performance alinhada com os objetivos.
 -  Um modelo supervisionado "conservador", pronto pra alertar até a menor suspeita de ataque.
 -  Um modelo não-supervisionado que detecta bem ataques e com ótima precisão.
+-  Ambos os modelos em produção
+-  Dados novos salvos na (servirão para retreino) bucket
+-  Sistema de Mensageria com Google Cloud Pub/Sub
