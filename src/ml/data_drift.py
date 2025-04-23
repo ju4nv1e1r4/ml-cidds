@@ -10,11 +10,20 @@ class DataDrift:
         self.df_train = Load(train_data).load_dataset()
         self.df_current = Load(current_data).load_dataset()
 
-    def kolmogorov_smirnov(self, feature):
+        self.df_train = self.df_train.drop(columns=["Unnamed: 0"], errors="ignore")
+        self.df_current = self.df_current.drop(columns=["Unnamed: 0"], errors="ignore")
+
+        common_cols = self.df_train.columns.intersection(self.df_current.columns)
+        self.df_train = self.df_train[common_cols]
+        self.df_current = self.df_current[common_cols]
+
+    def kolmogorov_smirnov(self, feature):       
+
         stat, p_value = ks_2samp(self.df_train[feature], self.df_current[feature])
         return stat, p_value
 
-    def jensen_shannon(self, feature):
+    def jensen_shannon(self, feature):      
+
         try:
             p = self.df_train[feature].value_counts(normalize=True).sort_index()
             q = self.df_current[feature].value_counts(normalize=True).sort_index()
@@ -28,7 +37,8 @@ class DataDrift:
         except Exception as e:
             return None
 
-    def generate_histogram(self, feature):
+    def generate_histogram(self, feature):    
+
         fig, ax = plt.subplots()
         ax.hist(
             self.df_train[feature],
