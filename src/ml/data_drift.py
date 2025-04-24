@@ -3,6 +3,7 @@ from scipy.spatial.distance import jensenshannon
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from ..models.load import Load
 
@@ -70,9 +71,24 @@ class DataDrift:
             return None
 
     def generate_histogram(self, feature):
-        fig, ax = plt.subplots()
-        ax.hist(self.df_train[feature], bins=50, alpha=0.5, label="Train Data")
-        ax.hist(self.df_current[feature], bins=50, alpha=0.5, label="Current Data")
-        ax.legend()
-        ax.set_title(f"Distribution of {feature}")
+        sns.set(style="whitegrid")
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        ax.hist(self.df_train[feature], bins=50, alpha=0.5, label="Train Data", color='blue', edgecolor='black')
+        ax.hist(self.df_current[feature], bins=50, alpha=0.5, label="Current Data", color='orange', edgecolor='black')
+
+        train_mean = self.df_train[feature].mean()
+        current_mean = self.df_current[feature].mean()
+        ax.axvline(train_mean, color='blue', linestyle='dashed', linewidth=2, label=f"Train Mean: {train_mean:.2f}")
+        ax.axvline(current_mean, color='orange', linestyle='dashed', linewidth=2, label=f"Current Mean: {current_mean:.2f}")
+
+        ax.set_xlabel(f'{feature} Value', fontsize=12)
+        ax.set_ylabel('Frequency', fontsize=12)
+        ax.set_title(f'Distribution of {feature}', fontsize=14)
+
+        ax.legend(loc='upper right')
+
+        fig.tight_layout()
+
         return fig
