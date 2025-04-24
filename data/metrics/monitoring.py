@@ -9,17 +9,21 @@ MIN_REGISTROS = 1000
 
 dd = DataDrift(TRAIN_PATH, CURRENT_PATH)
 
-st.markdown("📊 ## Monitoring")
+st.markdown("## Data Monitoring & Observability 📊")
 
 n_records = len(dd.df_current)
 if n_records < MIN_REGISTROS:
     st.warning(f"Attention: there are only {n_records} current records. Interpret carefully!")
 
-col = st.selectbox("Select a feature to inspect:", dd.df_train.columns)
+options = dd.df_train.columns.tolist()
+col = st.selectbox("Choose a column", options=options)
 
-st.subheader(f"Distribution: {col}")
-fig = dd.generate_histogram(col)
-st.pyplot(fig)
+if col is not None and col in dd.df_train.columns:
+    st.subheader(f"Distribution: {col}")
+    fig = dd.generate_histogram(col)
+    st.pyplot(fig)
+else:
+    st.warning("Choose a valid column.")
 
 if pd.api.types.is_numeric_dtype(dd.df_train[col]):
     stat, p_value = dd.kolmogorov_smirnov(col)
