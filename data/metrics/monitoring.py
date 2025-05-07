@@ -13,7 +13,9 @@ st.markdown("## Data Monitoring & Observability 📊")
 
 n_records = len(dd.df_current)
 if n_records < MIN_REGISTROS:
-    st.warning(f"Attention: there are only {n_records} current records. Interpret carefully!")
+    st.warning(
+        f"Attention: there are only {n_records} current records. Interpret carefully!"
+    )
 
 options = dd.df_train.columns.tolist()
 col = st.selectbox("Choose a column", options=options)
