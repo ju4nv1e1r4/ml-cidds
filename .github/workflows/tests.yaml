@@ -23,7 +23,6 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-html
 
-      - name: Run Pytest with HTML reports
+      - name: Run Pytest
         run: |
-          mkdir -p tests/reports
           PYTHONPATH=. pytest
