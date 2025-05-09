@@ -12,6 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+         project_id: ${{ secrets.GCP_PROJECT_ID }}
+         install_components: 'beta'
+
+      - name: Verify gcloud configuration
+        run: |
+          gcloud config list
+          gcloud info
+
       - name: Set up Python 3.11  
         uses: actions/setup-python@v4
         with:
@@ -25,6 +41,4 @@ jobs:
 
       - name: Run Pytest
         run: |
-          PYTHONPATH=. pytest tests/test_hyperparams_opt.py
-          PYTHONPATH=. pytest tests/test_monitoring_supervised_model.py
-          PYTHONPATH=. pytest tests/test_monitoring_unsupervised_model.py
+          PYTHONPATH=. pytest
