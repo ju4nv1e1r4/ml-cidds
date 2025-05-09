@@ -1,9 +1,10 @@
-import requests
-import random
 import datetime
-import schedule
-import time
 import logging
+import random
+import time
+
+import requests
+import schedule
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

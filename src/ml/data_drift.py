@@ -1,9 +1,8 @@
-from scipy.stats import ks_2samp
-from scipy.spatial.distance import jensenshannon
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+from scipy.spatial.distance import jensenshannon
+from scipy.stats import ks_2samp
 
 from ..models.load import Load
 
