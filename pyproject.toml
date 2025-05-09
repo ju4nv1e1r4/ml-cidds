@@ -4,8 +4,8 @@ line-length = 88
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "I"]  # E = pycodestyle, F = pyflakes, I = isort
-exclude = ["venv", "__pycache__"]
+exclude = ["venv", "__pycache__", "*.ipynb"]
 
 [tool.mypy]
 ignore_missing_imports = true
-exclude = ["env", "__pycache__"]
+exclude = ["env", "__pycache__", "*.ipynb"]
