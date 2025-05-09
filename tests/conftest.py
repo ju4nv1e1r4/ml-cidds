@@ -20,6 +20,7 @@ def gcs():
 def load():
     return Load("preprocessed/CIDDS-001.csv")
 
+
 @pytest.fixture(scope="session")
 def optimize():
     param_grid = {
@@ -56,47 +57,42 @@ def optimize():
         thresholds=thresholds,
     )
 
+
 @pytest.fixture(scope="session")
-@patch('pickle.load')
+@patch("pickle.load")
 def monitoring_supervised_model(mock_pickle_load):
     model_path = "src/artifacts/model_v20250409_154518.pkl"
     mock_model = MagicMock()
     mock_model.predict.return_value = [0]
     mock_pickle_load.return_value = mock_model
-    sup_sample_data = [
-        1678886400.0, 
-        1678886401.0, 
-        2000.0, 
-        100000000.0, 
-        8000.0, 
-        1.0
-    ]
+    sup_sample_data = [1678886400.0, 1678886401.0, 2000.0, 100000000.0, 8000.0, 1.0]
 
     infer_callable = mock_model.predict
 
     return SystemMetrics(
         infer_function=infer_callable,
         model_path=model_path,
-        sample_data=sup_sample_data
+        sample_data=sup_sample_data,
     )
 
+
 @pytest.fixture(scope="session")
-@patch('pickle.load')
+@patch("pickle.load")
 def monitoring_unsupervised_model(mock_pickle_load):
     model_path = "src/artifacts/unsupervised_model_v20250409_112404.pkl"
     mock_model = MagicMock()
     mock_model.predict.return_value = [0]
     mock_pickle_load.return_value = mock_model
     unsup_sample_data = [
-        1678886400.0, 
-        1678886401.0, 
-        1, 
-        200, 
-        443.0, 
-        "SYN", 
-        0.002, 
-        0.005, 
-        "TCP"
+        1678886400.0,
+        1678886401.0,
+        1,
+        200,
+        443.0,
+        "SYN",
+        0.002,
+        0.005,
+        "TCP",
     ]
 
     infer_callable = mock_model.predict
@@ -104,8 +100,9 @@ def monitoring_unsupervised_model(mock_pickle_load):
     return SystemMetrics(
         infer_function=infer_callable,
         model_path=model_path,
-        sample_data=unsup_sample_data
+        sample_data=unsup_sample_data,
     )
+
 
 @pytest.fixture
 def test_file(tmp_path):

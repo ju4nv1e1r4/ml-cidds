@@ -11,7 +11,7 @@ def test_refine_param_grid(optimize):
         "min_samples_split": 5,
         "some_float_param": 0.1,
         "some_category": "value",
-        "none_param": None
+        "none_param": None,
     }
 
     refine = optimize.refine_param_grid(best_params=sample_best_params)
@@ -46,7 +46,8 @@ def test_with_random_search(optimize):
 
     assert isinstance(rs, dict)
 
+
 def test_with_bayesian_search(optimize):
     bs = optimize.with_bayesian_search()
-    
+
     assert isinstance(bs, dict)
