@@ -57,9 +57,9 @@ class Optimize:
                 max_val = best_val * (1 + spread)
 
                 if isinstance(best_val, int):
-                    new_grid[param] = list(
-                        range(max(int(min_val), 1), int(max_val) + 1)
-                    )
+                    min_int = max(int(round(min_val)), 1)
+                    max_int = int(round(max_val)) + 1
+                    new_grid[param] = list(range(min_int, max_int))
                 else:
                     new_grid[param] = (
                         min_val,
