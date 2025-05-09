@@ -26,14 +26,8 @@ jobs:
       - name: Run Pytest with HTML reports
         run: |
           mkdir -p tests/reports
-          pytest tests/test_load_data.py --html=tests/reports/loader_tests.html
-          pytest tests/test_gcp.py --html=tests/reports/cloud_storage_tests.html
-          pytest tests/test_hyperparams_opt.py --html=tests/reports/trainning_tests.html
-          pytest tests/test_monitoring_supervised_model.py --html=tests/reports/monitoring_supmodel_tests.html
-          pytest tests/test_monitoring_unsupervised_model.py --html=tests/reports/monitoring_unsupmodel_tests.html
-      
-      - name: Upload Test Reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports
-          path: tests/reports
+          PYTHONPATH=. pytest tests/test_load_data.py --html=tests/reports/loader_tests.html
+          PYTHONPATH=. pytest tests/test_gcp.py --html=tests/reports/cloud_storage_tests.html
+          PYTHONPATH=. pytest tests/test_hyperparams_opt.py --html=tests/reports/trainning_tests.html
+          PYTHONPATH=. pytest tests/test_monitoring_supervised_model.py --html=tests/reports/monitoring_supmodel_tests.html
+          PYTHONPATH=. pytest tests/test_monitoring_unsupervised_model.py --html=tests/reports/monitoring_unsupmodel_tests.html
