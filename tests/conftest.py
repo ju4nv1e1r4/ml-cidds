@@ -75,15 +75,18 @@ def monitoring_supervised_model(mock_pickle_load):
     )
 
 @pytest.fixture(scope="session")
-def monitoring_unsupervised_model():
+@patch('pickle.load')
+def monitoring_unsupervised_model(mock_pickle_load):
     model_path = "src/artifacts/unsupervised_model_v20250409_112404.pkl"
-    unsup_sample_data = ["2025-04-16T12:00:00", "2025-04-16T12:00:01", 1, 200, 443.0, "SYN", 0.002, 0.005, "TCP"]
+    mock_model = MagicMock()
+    mock_model.predict.return_value = [0]
+    mock_pickle_load.return_value = mock_model
+    unsup_sample_data = [1678886400.0, 1678886401.0, 1, 200, 443.0, "SYN", 0.002, 0.005, "TCP"]
 
-    model = pickle.load(open(model_path, "rb"))
-    infer_function = model.predict
+    infer_callable = mock_model.predict
 
     return SystemMetrics(
-        infer_function=infer_function,
+        infer_function=infer_callable,
         model_path=model_path,
         sample_data=unsup_sample_data
     )
