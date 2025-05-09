@@ -26,7 +26,9 @@ def test_throughput(monitoring_unsupervised_model):
     assert throughput < float('inf')
 
 def test_export_metrics(monitoring_unsupervised_model):
-    local_path, filename = monitoring_unsupervised_model.export_metrics(mode="unsupervised")
+    local_path, filename = monitoring_unsupervised_model.export_metrics(
+        mode="unsupervised"
+    )
 
     assert isinstance(local_path, str)
     assert isinstance(filename, str)

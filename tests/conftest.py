@@ -1,15 +1,14 @@
-import pytest
 from unittest.mock import MagicMock, patch
 
-from sklearn.ensemble import RandomForestClassifier
+import pytest
 from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-import pickle
 
+from src.ml.metrics import SystemMetrics
+from src.ml.optmize import Optimize
 from src.models.load import Load
 from utils.gcp import CloudStorageOps
-from src.ml.optmize import Optimize
-from src.ml.metrics import SystemMetrics
 
 
 @pytest.fixture(scope="session")
@@ -64,7 +63,14 @@ def monitoring_supervised_model(mock_pickle_load):
     mock_model = MagicMock()
     mock_model.predict.return_value = [0]
     mock_pickle_load.return_value = mock_model
-    sup_sample_data = [1678886400.0, 1678886401.0, 2000.0, 100000000.0, 8000.0, 1.0]
+    sup_sample_data = [
+        1678886400.0, 
+        1678886401.0, 
+        2000.0, 
+        100000000.0, 
+        8000.0, 
+        1.0
+    ]
 
     infer_callable = mock_model.predict
 
@@ -81,7 +87,17 @@ def monitoring_unsupervised_model(mock_pickle_load):
     mock_model = MagicMock()
     mock_model.predict.return_value = [0]
     mock_pickle_load.return_value = mock_model
-    unsup_sample_data = [1678886400.0, 1678886401.0, 1, 200, 443.0, "SYN", 0.002, 0.005, "TCP"]
+    unsup_sample_data = [
+        1678886400.0, 
+        1678886401.0, 
+        1, 
+        200, 
+        443.0, 
+        "SYN", 
+        0.002, 
+        0.005, 
+        "TCP"
+    ]
 
     infer_callable = mock_model.predict
 
