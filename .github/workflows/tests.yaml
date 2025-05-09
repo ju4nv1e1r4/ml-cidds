@@ -25,4 +25,6 @@ jobs:
 
       - name: Run Pytest
         run: |
-          PYTHONPATH=. pytest
+          PYTHONPATH=. pytest tests/test_hyperparams_opt.py
+          PYTHONPATH=. pytest tests/test_monitoring_supervised_model.py
+          PYTHONPATH=. pytest tests/test_monitoring_unsupervised_model.py
